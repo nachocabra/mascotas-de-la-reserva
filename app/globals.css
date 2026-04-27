@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: 'Fraunces', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --cream: #f7f4ff;
+  --bark: #2c1654;
+  --moss: #7055be;
+  --terracotta: #c2456b;
+  --sand: #e0d8f5;
+}
+
+body {
+  background-color: var(--cream);
+  color: var(--bark);
+  font-family: var(--font-body);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, a, [role="button"] {
+  touch-action: manipulation;
+}
+
+input, textarea, select {
+  font-size: 16px !important;
+}
+
+.pb-safe {
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+@keyframes lost-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(194, 69, 107, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(194, 69, 107, 0); }
+}
+
+.lost-card {
+  animation: lost-pulse 2s ease-in-out infinite;
+}
