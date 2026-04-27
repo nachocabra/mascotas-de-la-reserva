@@ -14,6 +14,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [confirmId, setConfirmId] = useState<string | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!unlocked) return
@@ -41,7 +42,13 @@ export default function AdminPage() {
       const filename = animal.photo_url.split('animal-photos/').pop()
       if (filename) await supabase.storage.from('animal-photos').remove([filename])
     }
-    await supabase.from('animals').delete().eq('id', animal.id)
+    const { error } = await supabase.from('animals').delete().eq('id', animal.id)
+    if (error) {
+      setDeleteError('No se pudo borrar. Falta la política de borrado en Supabase.')
+      setDeleting(null)
+      setConfirmId(null)
+      return
+    }
     setAnimals((prev) => prev.filter((a) => a.id !== animal.id))
     setDeleting(null)
     setConfirmId(null)
@@ -86,6 +93,12 @@ export default function AdminPage() {
           <p className="text-sm mt-1" style={{ color: 'var(--bark)', opacity: 0.55 }}>{animals.length} mascota{animals.length !== 1 ? 's' : ''} registrada{animals.length !== 1 ? 's' : ''}</p>
         </div>
       </div>
+
+      {deleteError && (
+        <div className="mb-4 p-3 rounded-xl text-sm font-medium" style={{ backgroundColor: '#fdf0ec', color: 'var(--terracotta)' }}>
+          {deleteError}
+        </div>
+      )}
 
       {loading ? (
         <div className="space-y-3">
