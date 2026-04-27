@@ -11,19 +11,13 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [filterSpecies, setFilterSpecies] = useState<Species | 'all'>('all')
   const [filterStatus, setFilterStatus] = useState<Status | 'all'>('all')
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     async function load() {
-      const { data, error } = await supabase
-        .from('animals')
-        .select('*')
-        .order('status', { ascending: true }) // lost sorts before home alphabetically — we sort manually
+      const { data, error } = await supabase.from('animals').select('*')
       if (!error && data) {
-        // Lost first, then found, then home
-        const sorted = [...data].sort((a, b) => {
-          const order: Record<Status, number> = { lost: 0, found: 1, home: 2 }
-          return order[a.status as Status] - order[b.status as Status]
-        })
+        const sorted = [...data].sort((a, b) => a.name.localeCompare(b.name, 'es'))
         setAnimals(sorted)
       }
       setLoading(false)
@@ -31,9 +25,14 @@ export default function HomePage() {
     load()
   }, [])
 
+  const q = search.trim().toLowerCase()
   const filtered = animals.filter((a) => {
     if (filterSpecies !== 'all' && a.species !== filterSpecies) return false
     if (filterStatus !== 'all' && a.status !== filterStatus) return false
+    if (q) {
+      const haystack = [a.name, a.breed, a.color, a.lot_number].join(' ').toLowerCase()
+      if (!haystack.includes(q)) return false
+    }
     return true
   })
 
@@ -75,6 +74,26 @@ export default function HomePage() {
         </div>
       )}
 
+      {/* Search */}
+      <div className="relative mb-3">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 opacity-40" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--bark)' }}>
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Buscar por nombre, raza, color o lote…"
+          className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#e0d8f5] bg-white outline-none focus:border-[#7055be] transition-colors"
+          style={{ color: 'var(--bark)', fontSize: '16px' }}
+        />
+        {search && (
+          <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 opacity-40 hover:opacity-70 text-lg" style={{ color: 'var(--bark)' }}>
+            ✕
+          </button>
+        )}
+      </div>
+
       <FilterBar
         filterSpecies={filterSpecies}
         filterStatus={filterStatus}
@@ -92,10 +111,10 @@ export default function HomePage() {
         <div className="text-center py-20">
           <p className="text-5xl mb-4">🐾</p>
           <p className="font-display text-xl font-semibold" style={{ color: 'var(--bark)' }}>
-            No hay mascotas todavía
+            {q ? 'Sin resultados' : 'No hay mascotas todavía'}
           </p>
           <p className="text-sm mt-2 mb-6" style={{ color: 'var(--bark)', opacity: 0.5 }}>
-            ¡Sé el primero en registrar la tuya!
+            {q ? `No se encontró nada para "${search}"` : '¡Sé el primero en registrar la tuya!'}
           </p>
           <a
             href="/agregar"
