@@ -1,6 +1,6 @@
 import { Species, Status } from '@/types/animal'
 
-export const ACCESS_CODE = 'vecinos2025'
+export const ACCESS_CODE = 'Vecinos2025'
 export const ADMIN_CODE = 'admin2024'
 
 export function validateAccessCode(code: string): boolean {
