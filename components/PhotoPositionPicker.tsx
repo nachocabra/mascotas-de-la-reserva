@@ -39,6 +39,7 @@ export default function PhotoPositionPicker({ src, value, onChange }: Props) {
     if (!dragging) return
 
     function onMove(e: MouseEvent | TouchEvent) {
+      e.preventDefault()
       const container = containerRef.current
       if (!container) return
       const { width, height } = container.getBoundingClientRect()
@@ -74,7 +75,7 @@ export default function PhotoPositionPicker({ src, value, onChange }: Props) {
         onMouseDown={onStart}
         onTouchStart={onStart}
         className={`relative w-full rounded-xl overflow-hidden border border-[#e0d8f5] select-none ${dragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-        style={{ height: '13rem' }}
+        style={{ height: '13rem', touchAction: 'none' }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
